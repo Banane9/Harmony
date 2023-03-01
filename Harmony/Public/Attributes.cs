@@ -20,7 +20,7 @@ namespace HarmonyLib
 		/// <summary>This targets the MoveNext method of the enumerator result</summary>
 		Enumerator,
 #if NET40_OR_GREATER
-		/// <summary>This targets the MoveNext method of the async state machine</summary>
+		/// <summary>This targets the MoveNext method of the async state machine that actually has the method's implementation</summary>
 		Async
 #endif
 	}
