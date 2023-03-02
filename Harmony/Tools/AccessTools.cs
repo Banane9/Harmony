@@ -519,7 +519,7 @@ namespace HarmonyLib
 			}
 
 			var asyncStateMachineType = asyncAttribute.StateMachineType;
-			var asyncMethodBody = DeclaredMethod(asyncStateMachineType, "MoveNext");
+			var asyncMethodBody = DeclaredMethod(asyncStateMachineType, nameof(IAsyncStateMachine.MoveNext));
 			if (asyncMethodBody is null)
 			{
 				FileLog.Debug($"AccessTools.AsyncMoveNext: Could not find async method body for {method.FullDescription()}");
