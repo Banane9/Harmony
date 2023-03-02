@@ -512,7 +512,7 @@ namespace HarmonyLib
 			}
 
 			var asyncAttribute = method.GetCustomAttribute<AsyncStateMachineAttribute>();
-			if (asyncAttribute == null)
+			if (asyncAttribute is null)
 			{
 				FileLog.Debug($"AccessTools.AsyncMoveNext: Could not find AsyncStateMachine for {method.FullDescription()}");
 				return null;
@@ -520,7 +520,7 @@ namespace HarmonyLib
 
 			var asyncStateMachineType = asyncAttribute.StateMachineType;
 			var asyncMethodBody = DeclaredMethod(asyncStateMachineType, "MoveNext");
-			if (asyncMethodBody == null)
+			if (asyncMethodBody is null)
 			{
 				FileLog.Debug($"AccessTools.AsyncMoveNext: Could not find async method body for {method.FullDescription()}");
 				return null;
