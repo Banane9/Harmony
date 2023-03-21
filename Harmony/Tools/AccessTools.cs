@@ -470,7 +470,46 @@ namespace HarmonyLib
 		/// <summary>Gets the <see cref="IEnumerator.MoveNext" /> method of an enumerator method</summary>
 		/// <param name="method">Enumerator method that creates the enumerator <see cref="IEnumerator" /></param>
 		/// <returns>The internal <see cref="IEnumerator.MoveNext" /> method of the enumerator or <b>null</b> if no valid enumerator is detected</returns>
+		[Obsolete("Use AccessTools.StateMachineMoveNext(method) instead.")]
 		public static MethodInfo EnumeratorMoveNext(MethodBase method)
+		{
+			return StateMachineMoveNext(method);
+		}
+
+#if NET45_OR_GREATER
+		/// <summary>Gets the <see cref="IEnumerator.MoveNext"/> or <see cref="IAsyncStateMachine.MoveNext"/> method of a method's state machine</summary>
+		/// <param name="method">The method that creates the state machine internally</param>
+		/// <returns>The internal <see cref="IEnumerator.MoveNext"/> or <see cref="IAsyncStateMachine.MoveNext"/> method of the state machine or <b>null</b> if no valid iterator or async method is detected</returns>
+		public static MethodInfo StateMachineMoveNext(MethodBase method)
+		{
+			if (method is null)
+			{
+				FileLog.Debug("AccessTools.StateMachineMoveNext: method is null");
+				return null;
+			}
+
+			var stateMachineAttribute = method.GetCustomAttribute<StateMachineAttribute>();
+			if (stateMachineAttribute is null)
+			{
+				FileLog.Debug($"AccessTools.StateMachineMoveNext: Could not find StateMachineAttribute for {method.FullDescription()}");
+				return null;
+			}
+
+			var stateMachineType = stateMachineAttribute.StateMachineType;
+			var moveNextMethod = DeclaredMethod(stateMachineType, "MoveNext");
+			if (moveNextMethod is null)
+			{
+				FileLog.Debug($"AccessTools.StateMachineMoveNext: Could not find state machine method body for {method.FullDescription()}");
+				return null;
+			}
+
+			return moveNextMethod;
+		}
+#else
+		/// <summary>Gets the <see cref="IEnumerator.MoveNext"/> method of an iterator method's state machine</summary>
+		/// <param name="method">The method that creates the state machine internally</param>
+		/// <returns>The internal <see cref="IEnumerator.MoveNext"/> method of the iterator state machine or <b>null</b> if no valid iterator method is detected</returns>
+		public static MethodInfo StateMachineMoveNext(MethodBase method)
 		{
 			if (method is null)
 			{
@@ -497,36 +536,6 @@ namespace HarmonyLib
 				return null;
 			}
 			return Method(type, nameof(IEnumerator.MoveNext));
-		}
-
-#if NET40_OR_GREATER
-		/// <summary>Gets the <see cref="IAsyncStateMachine.MoveNext" /> method of an async method's state machine</summary>
-		/// <param name="method">Async method that creates the state machine internally</param>
-		/// <returns>The internal <see cref="IAsyncStateMachine.MoveNext" /> method of the async state machine or <b>null</b> if no valid async method is detected</returns>
-		public static MethodInfo AsyncMoveNext(MethodBase method)
-		{
-			if (method is null)
-			{
-				FileLog.Debug("AccessTools.AsyncMoveNext: method is null");
-				return null;
-			}
-
-			var asyncAttribute = method.GetCustomAttribute<AsyncStateMachineAttribute>();
-			if (asyncAttribute is null)
-			{
-				FileLog.Debug($"AccessTools.AsyncMoveNext: Could not find AsyncStateMachine for {method.FullDescription()}");
-				return null;
-			}
-
-			var asyncStateMachineType = asyncAttribute.StateMachineType;
-			var asyncMethodBody = DeclaredMethod(asyncStateMachineType, nameof(IAsyncStateMachine.MoveNext));
-			if (asyncMethodBody is null)
-			{
-				FileLog.Debug($"AccessTools.AsyncMoveNext: Could not find async method body for {method.FullDescription()}");
-				return null;
-			}
-
-			return asyncMethodBody;
 		}
 #endif
 

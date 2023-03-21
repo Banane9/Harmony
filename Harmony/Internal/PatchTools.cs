@@ -81,19 +81,11 @@ namespace HarmonyLib
 							.Where(c => c.IsStatic)
 							.FirstOrDefault();
 
-					case MethodType.Enumerator:
+					case MethodType.StateMachine:
 						if (attr.methodName is null)
 							return null;
-						var enumMethod = AccessTools.DeclaredMethod(attr.declaringType, attr.methodName, attr.argumentTypes);
-						return AccessTools.EnumeratorMoveNext(enumMethod);
-
-#if NET40_OR_GREATER
-					case MethodType.Async:
-						if (attr.methodName is null)
-							return null;
-						var asyncMethod = AccessTools.DeclaredMethod(attr.declaringType, attr.methodName, attr.argumentTypes);
-						return AccessTools.AsyncMoveNext(asyncMethod);
-#endif
+						var method = AccessTools.DeclaredMethod(attr.declaringType, attr.methodName, attr.argumentTypes);
+						return AccessTools.StateMachineMoveNext(method);
 				}
 			}
 			catch (AmbiguousMatchException ex)
